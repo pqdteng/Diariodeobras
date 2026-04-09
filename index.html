@@ -2,535 +2,458 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Gerencial de Contratos - TJMS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário de Obras - TJMS</title>
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        /* CABEÇALHO COM IMAGEM DE FUNDO */
-        .header-bg { 
-            background-image: 
-                linear-gradient(135deg, rgba(30, 60, 114, 0.92) 0%, rgba(42, 82, 152, 0.85) 100%), 
-                url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Bras%C3%A3o_do_Mato_Grosso_do_Sul.svg/800px-Bras%C3%A3o_do_Mato_Grosso_do_Sul.svg.png');
-            background-size: cover;
-            background-position: center 20%;
-            background-repeat: no-repeat;
-            color: white; 
-            padding: 40px 20px; 
-            border-radius: 0 0 20px 20px; 
-            margin-bottom: 25px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        :root {
+            --primary-color: #1a4066;
+            --border-color: #333;
+            --bg-light: #f4f7f6;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* CABEÇALHO */
+        .header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            border: 2px solid var(--border-color);
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-text {
+            flex-grow: 1;
+        }
+
+        .header-text p {
+            margin: 2px 0;
+            font-size: 14px;
+        }
+
+        .header-rdo-info {
+            text-align: right;
+        }
+
+        /* SEÇÕES E TABELAS */
+        .section-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 6px;
+            text-align: left;
+        }
+
+        input[type="text"], input[type="date"], input[type="number"], input[type="time"] {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus {
+            background-color: #e8f0fe;
+        }
+
+        .input-number-small {
+            width: 40px !important;
             text-align: center;
         }
 
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); margin-bottom: 20px; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-3px); }
-        .kpi-title { font-size: 0.70rem; color: #7f8c8d; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        .kpi-value { font-size: 1.5rem; font-weight: 900; color: #2c3e50; margin-top: 5px; }
-        
-        /* Botão de Upload Centralizado */
-        .upload-area { 
-            background-color: rgba(255,255,255,0.15); 
-            border: 2px dashed rgba(255,255,255,0.8); 
-            border-radius: 10px; 
-            padding: 15px 40px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            color: white;
-            backdrop-filter: blur(5px);
-            margin-top: 15px;
+        /* EQUIPE GRID */
+        .equipe-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            padding: 10px;
         }
-        .upload-area:hover { background-color: rgba(255,255,255,0.3); border-color: #fff; transform: scale(1.02); }
-        
-        .fw-black { font-weight: 900; letter-spacing: 0.5px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);}
-        .config-bar { background-color: #fff; border-radius: 10px; padding: 15px; margin-bottom: 25px; border: 1px solid #dee2e6; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
-        .macro-row { cursor: pointer; transition: background-color 0.2s; }
-        .macro-row:hover { background-color: #e2e6ea; }
-        .table-wrapper { max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;}
+
+        .equipe-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        /* TEXTAREAS */
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* BOTOES E FOTOS */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0d253d;
+        }
+
+        .btn-clear {
+            background-color: #dc3545;
+        }
+
+        .btn-clear:hover {
+            background-color: #a71d2a;
+        }
+
+        #photo-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .photo-preview {
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 5px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .photo-caption {
+            width: 100%;
+            border: none;
+            border-top: 1px solid #ccc;
+            padding: 5px;
+            margin-top: 5px;
+            outline: none;
+            font-size: 11px;
+        }
+
+        .btn-remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* ASSINATURAS */
+        .assinaturas {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .assinatura-box {
+            width: 40%;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+        }
+
+        /* IMPRESSÃO */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                -webkit-print-color-adjust: exact; /* Força o Chrome/Edge a imprimir o fundo */
+                print-color-adjust: exact; /* Regra padrão para forçar as cores */
+            }
+            .section-title {
+                background-color: #1a4066 !important; /* Garante o azul escuro na impressão */
+                color: white !important; /* Garante a letra branca na impressão */
+            }
+            .container {
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            .controls, .no-print, .btn-remove-photo {
+                display: none !important;
+            }
+            textarea {
+                border: none;
+                resize: none;
+                overflow: hidden;
+            }
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="container-fluid px-4 pb-5">
+<div class="container" id="rdo-content">
     
-    <div class="header-bg">
-        <h2 class="mb-1 fw-black">Painel de Fiscalização de Obras - TJMS</h2>
-        <p class="mb-0 fs-6" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Contrato 01.011/2026 | Anexo e Gabinetes (Novo Cronograma Repactuado)</p>
-        
-        <div class="upload-area" onclick="document.getElementById('excelUpload').click()">
-            <label class="form-label fw-bold mb-0" style="cursor: pointer; font-size: 1.1rem;">
-                📂 Importar Planilha de Medição (.XLSM)
-            </label>
-            <input class="d-none" type="file" id="excelUpload" accept=".xlsm, .xlsb, .xlsx, .xls">
-            <small id="fileNameDisplay" class="d-block mt-1">Clique para atualizar os dados</small>
+    <div class="header">
+        <div class="logo-placeholder">
+            <img src="imagem1.jpg" style="width: 80px; height: auto;">
         </div>
-    </div>
-
-    <div class="config-bar">
-        <h6 class="fw-bold text-secondary mb-2" style="font-size: 0.85rem;">⚙️ Dados da Medição (Extração Automática)</h6>
-        <div class="row g-2 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label small mb-0 fw-bold text-primary">Mês de Referência</label>
-                <select id="selMes" class="form-select form-select-sm border-primary" onchange="atualizarInterface()">
-                    <option value="1" selected>Medição 01 (Mês 1)</option>
-                    <option value="2">Medição 02 (Mês 2)</option>
-                    <option value="3">Medição 03 (Mês 3)</option>
-                    <option value="4">Medição 04 (Mês 4)</option>
-                    <option value="5">Medição 05 (Mês 5)</option>
-                    <option value="6">Medição 06 (Mês 6)</option>
-                    <option value="7">Medição 07 (Mês 7)</option>
-                    <option value="8">Medição 08 (Mês 8)</option>
-                    <option value="9">Medição 09 (Mês 9)</option>
-                    <option value="10">Medição 10 (Mês 10)</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label small mb-0 fw-bold">Contrato Base (R$)</label>
-                <input type="number" id="inpContrato" class="form-control form-control-sm" value="0" onchange="atualizarInterface()">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label small mb-0 fw-bold text-warning">Aditivos (+)</label>
-                <input type="number" id="inpAditivo" class="form-control form-control-sm" value="0" onchange="atualizarInterface()">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label small mb-0 fw-bold text-danger">Supressões (-)</label>
-                <input type="number" id="inpSupressao" class="form-control form-control-sm" value="0" onchange="atualizarInterface()">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label small mb-0 fw-bold text-primary">Avanço Medido (%)</label>
-                <input type="number" id="inpMedido" class="form-control form-control-sm border-primary" value="0" step="0.01" onchange="atualizarInterface()">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-sm btn-dark w-100 fw-bold shadow-sm" onclick="atualizarInterface()">Atualizar Painel</button>
+        <div class="header-text">
+            <p>ESTADO DE MATO GROSSO DO SUL</p>
+            <p>PODER JUDICIÁRIO - TRIBUNAL DE JUSTIÇA</p>
+            <p>SECRETARIA DE OBRAS - DEPARTAMENTO DE OBRAS E SERVIÇOS</p>
+            <h2>DIÁRIO DE OBRA</h2>
+        </div>
+        <div class="header-rdo-info">
+            <p>FOLHA Nº: <input type="text" id="folha-num" style="width: 50px; text-align: center; border-bottom: 1px solid #000;"></p>
+            <div class="logo-placeholder" style="margin-top:10px;">
+                <img src="imagem2.jpg" style="width: 80px; height: auto;">
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card p-3 border-start border-4 border-success">
-                <div class="kpi-title">Valor Contrato Atualizado</div>
-                <div class="kpi-value text-success" id="valAtualizado">R$ 0,00</div>
-                <small class="text-muted mt-2">Base + Adit. - Supres.</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card p-3 border-start border-4 border-primary">
-                <div class="kpi-title">Total Medido em Reais</div>
-                <div class="kpi-value text-primary" id="valMedidoRS">R$ 0,00</div>
-                <small class="text-muted mt-2" id="valMedidoPerc">Avanço Atual: 0.00%</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card p-3 border-start border-4 border-danger" id="cardAtraso">
-                <div class="kpi-title">Situação de Cronograma</div>
-                <div class="kpi-value text-danger" id="valGap">0.00%</div>
-                <small class="text-muted mt-2" id="txtMeta">Meta Acumulada: 0.29%</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card p-3 border-start border-4 border-warning" style="background-color: #fffaf0;">
-                <div class="kpi-title" style="color: #d35400;">Meta P/ Próxima Medição</div>
-                <div class="kpi-value text-warning" id="valMetaProxima" style="color: #e67e22!important;">R$ 0,00</div>
-                <small class="text-muted mt-2">Saldo a faturar p/ equalizar</small>
-            </div>
-        </div>
+    <table>
+        <tr>
+            <td colspan="3"><b>OBRA:</b> <input type="text" id="obra-nome" value="Construção do Anexo e Reforma dos Gabinetes"></td>
+            <td><b>DATA:</b> <input type="date" id="data-rdo"></td>
+        </tr>
+        <tr>
+            <td colspan="3"><b>EMPRESA:</b> <input type="text" id="empresa-nome" value="Poligonal Engenharia"></td>
+            <td><b>LOCAL:</b> <input type="text" id="local-obra" value="TJMS"></td>
+        </tr>
+        <tr>
+            <td><b>CONTRATO:</b> <input type="text" id="contrato-num" value="01.011/2026"></td>
+            <td><b>INÍCIO:</b> <input type="date" id="data-inicio"></td>
+            <td colspan="2"><b>PRAZO:</b> <input type="text" id="prazo-obra"></td>
+        </tr>
+    </table>
+
+    <div class="section-title">TEMPO (CLIMA) E CONDIÇÕES</div>
+    <table>
+        <tr>
+            <td width="25%"><input type="radio" name="clima" value="Bom" id="clima-bom"> Bom</td>
+            <td width="25%"><input type="radio" name="clima" value="Instavel" id="clima-instavel"> Instável</td>
+            <td width="25%"><input type="radio" name="clima" value="Chuvoso" id="clima-chuvoso"> Chuvoso</td>
+            <td width="25%"><input type="radio" name="clima" value="Impraticavel" id="clima-impraticavel"> Impraticável</td>
+        </tr>
+        <tr>
+            <td colspan="2"><b>DIA DA SEMANA:</b> <input type="text" id="dia-semana" style="width: 60%"></td>
+            <td colspan="2">
+                <b>PERÍODO DE CHUVA:</b> <input type="time" id="chuva-inicio" style="width:60px"> às <input type="time" id="chuva-fim" style="width:60px"><br>
+                <b>PARALISAÇÃO:</b> <input type="time" id="para-inicio" style="width:60px"> às <input type="time" id="para-fim" style="width:60px">
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">PESSOAL / EQUIPAMENTO</div>
+    <div class="equipe-grid">
+        <div class="equipe-item"><label>Servente:</label> <input type="number" id="eq-servente" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Pedreiro:</label> <input type="number" id="eq-pedreiro" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Armador:</label> <input type="number" id="eq-armador" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Carpinteiro:</label> <input type="number" id="eq-carpinteiro" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Soldador:</label> <input type="number" id="eq-soldador" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Encanador:</label> <input type="number" id="eq-encanador" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Eletricista:</label> <input type="number" id="eq-eletricista" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Pintor:</label> <input type="number" id="eq-pintor" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Mestre de Obra:</label> <input type="number" id="eq-mestre" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Engenheiro:</label> <input type="number" id="eq-engenheiro" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Administrativo:</label> <input type="number" id="eq-adm" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item"><label>Empreiteiros:</label> <input type="number" id="eq-empreiteiros" class="input-number-small sum-calc" min="0"></div>
+        <div class="equipe-item" style="grid-column: span 2;"><label>Outros/Equipamentos:</label> <input type="text" id="eq-outros" style="width: 70%;"></div>
+        <div class="equipe-item" style="background-color: #eef; font-weight: bold;"><label>TOTAL GERAL:</label> <input type="text" id="total-equipe" class="input-number-small" readonly style="font-weight: bold; background: transparent;"></div>
     </div>
 
-    <div class="row mb-2">
-        <div class="col-md-4">
-            <div class="card p-3" style="height: 100%;">
-                <h6 class="fw-bold" style="color: #34495e;">Serviços Ativos na Medição</h6>
-                <p class="text-muted small mb-1">Itens com avanço estritamente > 0%.</p>
-                <div class="table-wrapper">
-                    <table class="table table-hover table-sm mb-0">
-                        <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
-                            <tr><th>Item e Descrição</th><th class="text-center">Avanço</th></tr>
-                        </thead>
-                        <tbody id="macroTableBody">
-                            <tr><td colspan="2" class="text-center text-muted small py-3">Aguardando Planilha...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <div class="section-title">DESCRIÇÃO DOS SERVIÇOS EXECUTADOS</div>
+    <textarea id="desc-servicos" placeholder="Detalhe as atividades realizadas no dia..."></textarea>
 
-        <div class="col-md-4">
-            <div class="card p-3 d-flex align-items-center justify-content-center" style="height: 100%;">
-                <div style="position: relative; width: 100%; height: 250px;">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
-        </div>
+    <div class="section-title">COMENTÁRIOS / OCORRÊNCIAS DA FISCALIZAÇÃO / OCORRÊNCIAS EMPRESA</div>
+    <textarea id="desc-ocorrencias" placeholder="Apontamentos da fiscalização, interferências, aprovações, etc..."></textarea>
 
-        <div class="col-md-4">
-            <div class="card p-4" style="height: 100%;">
-                <h6 class="fw-bold mb-3 text-center" style="color: #2c3e50;">Visão: Próxima Medição (R$)</h6>
-                <div style="position: relative; width: 100%; height: 200px;">
-                    <canvas id="metaChart"></canvas>
-                </div>
-                <div class="mt-4">
-                    <button class="btn btn-outline-danger w-100 fw-bold shadow-sm" id="btnWord" onclick="gerarWordAtraso()" disabled>
-                        Gerar Notificação (.doc)
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="section-title">RELATÓRIO FOTOGRÁFICO</div>
+    <div id="photo-container"></div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card p-4">
-                <h5 class="fw-bold mb-3 text-center" style="color: #2c3e50;">Novo Cronograma Físico-Financeiro (Curva S)</h5>
-                <p class="text-center text-muted small mb-4">Comparativo do Desempenho Acumulado Previsto vs. Executado com base na Repactuação.</p>
-                <div style="position: relative; width: 100%; height: 350px;">
-                    <canvas id="evolutionChart"></canvas>
-                </div>
-            </div>
+    <div class="assinaturas">
+        <div class="assinatura-box">
+            <b>Assinatura da Contratada</b><br>
+            Engenheiro Residente / Preposto
+        </div>
+        <div class="assinatura-box">
+            <b>Assinatura da Fiscalização</b><br>
+            Fiscal de Obras - TJMS
         </div>
     </div>
 
 </div>
 
+<div class="controls no-print">
+    <input type="file" id="image-upload" accept="image/*" multiple style="display: none;" onchange="previewImages()">
+    <button class="btn" onclick="document.getElementById('image-upload').click()">📷 Inserir Fotos</button>
+    <button class="btn btn-clear" onclick="limparDados()">🗑 Limpar Formulário</button>
+    <button class="btn" onclick="window.print()" style="background-color: #28a745;">📄 Exportar para PDF</button>
+</div>
+
 <script>
-    // ==========================================
-    // NOVO CRONOGRAMA REPACTUADO (Fornecido pelo Fiscal)
-    // ==========================================
-    const cronogramaPerc = [0.29, 1.69, 8.37, 14.23, 14.73, 16.46, 14.30, 11.67, 11.59, 6.66];
-    
-    // Calcula o Acumulado (Resultará em: 0.29, 1.98, 10.35, 24.59, 39.32...)
-    let cronogramaAcumulado = [];
-    cronogramaPerc.reduce((a, b, i) => cronogramaAcumulado[i] = a + b, 0);
-    const dadosPrevistosCurva = [0, ...cronogramaAcumulado]; 
+    // SOMA DA EQUIPE
+    const inputs = document.querySelectorAll('.sum-calc');
+    const totalField = document.getElementById('total-equipe');
 
-    let metaChart, radarChart, evolutionChart;
-    const formatRS = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-    let macrosList = [];
-
-    // ==========================================
-    // INICIALIZA OS 3 GRÁFICOS
-    // ==========================================
-    function initCharts() {
-        const ctxM = document.getElementById('metaChart').getContext('2d');
-        metaChart = new Chart(ctxM, {
-            type: 'bar',
-            data: {
-                labels: ['Medido Atual', 'Falta p/ o Próximo Mês'],
-                datasets: [{ data: [0, 0], backgroundColor: ['#2980b9', '#f39c12'], borderRadius: 4 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    function calculateTotal() {
+        let total = 0;
+        inputs.forEach(inp => {
+            let val = parseInt(inp.value);
+            if (!isNaN(val)) total += val;
         });
-
-        const ctxR = document.getElementById('radarChart').getContext('2d');
-        radarChart = new Chart(ctxR, {
-            type: 'radar',
-            data: {
-                labels: ['Vazio'],
-                datasets: [{
-                    data: [0],
-                    backgroundColor: 'rgba(52, 152, 219, 0.4)', borderColor: '#2980b9',
-                    pointBackgroundColor: '#e74c3c', borderWidth: 2
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { r: { suggestedMin: 0, suggestedMax: 100 } }, plugins: { legend: { display: false } } }
-        });
-
-        const ctxE = document.getElementById('evolutionChart').getContext('2d');
-        evolutionChart = new Chart(ctxE, {
-            type: 'line',
-            data: {
-                labels: ['Início', 'Mês 1', 'Mês 2', 'Mês 3', 'Mês 4', 'Mês 5', 'Mês 6', 'Mês 7', 'Mês 8', 'Mês 9', 'Mês 10'],
-                datasets: [
-                    {
-                        label: '% Planejado (Repactuado)', data: dadosPrevistosCurva,
-                        borderColor: '#3498db', backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        borderWidth: 2, fill: true, tension: 0.3
-                    },
-                    {
-                        label: '% Executado', data: [0],
-                        borderColor: '#27ae60', backgroundColor: '#27ae60',
-                        borderWidth: 4, pointRadius: 5, fill: false, tension: 0.1, spanGaps: true
-                    }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
-        });
-    }
-    initCharts();
-
-    function renderMacroTable() {
-        const tbody = document.getElementById('macroTableBody');
-        tbody.innerHTML = '';
-        
-        if (macrosList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted small py-3">Nenhum serviço medido (> 0%).</td></tr>`;
-            return;
-        }
-
-        macrosList.forEach((macro, index) => {
-            let tr = document.createElement('tr');
-            tr.className = 'macro-row';
-            tr.onclick = () => highlightRadar(index);
-            let cor = macro.executado >= 100 ? "text-success fw-bold" : "text-primary fw-bold";
-            
-            tr.innerHTML = `
-                <td style="font-size:0.75rem; vertical-align: middle;" title="${macro.nome_completo}">
-                    <strong>${macro.id}</strong> - ${macro.nome}
-                </td>
-                <td class="text-center ${cor}" style="vertical-align: middle;">${macro.executado.toFixed(1)}%</td>`;
-            tbody.appendChild(tr);
-        });
+        totalField.value = total;
     }
 
-    function highlightRadar(index) {
-        if(macrosList.length === 0) return;
-        let ptColors = new Array(macrosList.length).fill('#e74c3c');
-        let ptRadii = new Array(macrosList.length).fill(3);
-        ptColors[index] = '#f1c40f'; ptRadii[index] = 8;
-        radarChart.data.datasets[0].pointBackgroundColor = ptColors;
-        radarChart.data.datasets[0].pointRadius = ptRadii;
-        radarChart.update();
-    }
-
-    // ==========================================
-    // NÚCLEO MATEMÁTICO: ATUALIZA TELA
-    // ==========================================
-    function atualizarInterface() {
-        let mesAtual = parseInt(document.getElementById('selMes').value);
-        let vContrato = parseFloat(document.getElementById('inpContrato').value) || 0;
-        let vAditivo = parseFloat(document.getElementById('inpAditivo').value) || 0;
-        let vSupressao = parseFloat(document.getElementById('inpSupressao').value) || 0;
-        let pMed = parseFloat(document.getElementById('inpMedido').value) || 0;
-
-        let atualizado = vContrato + vAditivo - vSupressao;
-        let medidoReais = (pMed / 100) * atualizado;
-
-        let pPrevAtual = cronogramaAcumulado[mesAtual - 1] || 100;
-        let atraso = pPrevAtual - pMed;
-
-        let pPrevProximo = cronogramaAcumulado[mesAtual] || 100; 
-        let metaProximaRS = (pPrevProximo / 100) * atualizado;
-        let faltaFaturar = metaProximaRS - medidoReais;
-        if (faltaFaturar < 0) faltaFaturar = 0;
-
-        document.getElementById('valAtualizado').innerText = formatRS(atualizado);
-        document.getElementById('valMedidoRS').innerText = formatRS(medidoReais);
-        document.getElementById('valMedidoPerc').innerText = `Avanço Físico Atual: ${pMed.toFixed(2)}%`;
-        
-        let elGap = document.getElementById('valGap');
-        let cardAtraso = document.getElementById('cardAtraso');
-        let btnWord = document.getElementById('btnWord');
-        document.getElementById('txtMeta').innerText = `Meta Acumulada Mês ${mesAtual}: ${pPrevAtual.toFixed(2)}%`;
-
-        let corEvolucao = '#27ae60';
-        if (pMed > 0 && atraso > 0.01) {
-            elGap.innerText = `${atraso.toFixed(2)}% (Atraso)`;
-            elGap.className = "kpi-value text-danger";
-            cardAtraso.className = "card p-3 border-start border-4 border-danger";
-            btnWord.disabled = false;
-            corEvolucao = '#e74c3c';
-        } else {
-            // Se atraso for negativo ou zero, significa Adiantado ou No Prazo
-            let avancoExtra = Math.abs(atraso);
-            elGap.innerText = `+${avancoExtra.toFixed(2)}% (Adiantado)`;
-            elGap.className = "kpi-value text-success";
-            cardAtraso.className = "card p-3 border-start border-4 border-success";
-            btnWord.disabled = true;
-        }
-
-        document.getElementById('valMetaProxima').innerText = formatRS(faltaFaturar);
-        metaChart.data.datasets[0].data = [medidoReais, faltaFaturar];
-        metaChart.update();
-
-        // Curva S
-        let dadosExecutados = new Array(11).fill(null);
-        dadosExecutados[0] = 0; 
-        dadosExecutados[mesAtual] = pMed; 
-
-        evolutionChart.data.datasets[1].data = dadosExecutados;
-        evolutionChart.data.datasets[1].borderColor = corEvolucao;
-        evolutionChart.data.datasets[1].backgroundColor = corEvolucao;
-        evolutionChart.update();
-    }
-
-    // ==========================================
-    // ROBÔ DE LEITURA
-    // ==========================================
-    function cleanNum(val) {
-        if (val === null || val === undefined || val === '') return 0;
-        if (typeof val === 'number') return val;
-        let s = String(val).toUpperCase().trim();
-        if (s === '-' || s === '') return 0;
-        
-        s = s.replace('%', '').replace(/[^\d,\.-]/g, ''); 
-        let lastComma = s.lastIndexOf(',');
-        let lastDot = s.lastIndexOf('.');
-        if (lastComma > lastDot) s = s.replace(/\./g, '').replace(',', '.');
-        else if (lastDot > lastComma) s = s.replace(/,/g, '');
-        else if (lastComma !== -1 && lastDot === -1) s = s.replace(',', '.');
-        
-        let num = parseFloat(s);
-        return isNaN(num) ? 0 : num;
-    }
-
-    document.getElementById('excelUpload').addEventListener('change', function(e) {
-        let file = e.target.files[0];
-        if (!file) return;
-
-        document.getElementById('fileNameDisplay').innerHTML = `⏳ Lendo arquivo e separando os dados medidos...`;
-
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                let data = new Uint8Array(e.target.result);
-                let workbook = XLSX.read(data, {type: 'array', cellDates: true}); 
-
-                let valContrato = 0, valPerc = 0;
-                let valAditivo = 0, valSupressao = 0;
-                let macrosDetectadas = [];
-
-                workbook.SheetNames.forEach(function(nomeDaAba) {
-                    let ws = workbook.Sheets[nomeDaAba];
-                    let linhas = XLSX.utils.sheet_to_json(ws, {header: "A", raw: true, defval: ""}); 
-
-                    linhas.forEach(row => {
-                        let linhaStr = Object.values(row).map(c => String(c).toUpperCase()).join(" | ");
-                        
-                        let idColA = String(row.A || "").trim();
-                        let idClean = idColA.replace(/\s+/g, ''); 
-                        let descColE = String(row.E || "").trim();
-                        let medidoColJ = cleanNum(row.J); 
-                        let percentColR = cleanNum(row.R); 
-                        let valorColQ = cleanNum(row.Q); 
-
-                        if (linhaStr.includes("TOTAL MEDIÇÃO COM BDI") || linhaStr.includes("VALOR TOTAL DA MEDIÇÃO")) {
-                            if (valorColQ > valContrato && valorColQ > 10000) valContrato = valorColQ;
-                            let isStrPerc = typeof row.R === 'string' && String(row.R).includes('%');
-                            if (percentColR > 0) {
-                                if (percentColR <= 1 && !isStrPerc) valPerc = percentColR * 100;
-                                else valPerc = percentColR;
-                            }
-                        }
-
-                        if (nomeDaAba.toUpperCase().includes("ACOMPANHAMENTO")) {
-                            let numsRow = Object.values(row).map(cleanNum).filter(n => n > 0);
-                            if (linhaStr.includes("VALOR DE ADITIVO CONTRATUAL")) {
-                                let num = Math.max(...numsRow, 0);
-                                if (num > valAditivo) valAditivo = num;
-                            }
-                            if (linhaStr.includes("VALOR DE SUPRESSÃO CONTRATUAL") || linhaStr.includes("DECRÉSCIMO")) {
-                                let num = Math.max(...numsRow, 0);
-                                if (num > valSupressao) valSupressao = num;
-                            }
-                        }
-
-                        if (/^[0-9]+(\.[0-9]+)*$/.test(idClean) && descColE.length > 5 && !descColE.toUpperCase().includes("TOTAL")) {
-                            let pctFinal = percentColR;
-                            let isStrPercItem = typeof row.R === 'string' && String(row.R).includes('%');
-                            
-                            if (pctFinal > 0 && pctFinal <= 1 && !isStrPercItem) {
-                                pctFinal = pctFinal * 100;
-                            } else if (pctFinal === 0 && medidoColJ > 0 && valorColQ > 0) {
-                                pctFinal = (medidoColJ / valorColQ) * 100;
-                            }
-
-                            if (pctFinal > 0.01) {
-                                macrosDetectadas.push({ 
-                                    id: idClean,
-                                    nome: descColE.substring(0, 32) + '...', 
-                                    nome_completo: idColA + " - " + descColE,
-                                    executado: pctFinal 
-                                });
-                            }
-                        }
-                    });
-                });
-
-                if (valContrato > 0) document.getElementById('inpContrato').value = valContrato.toFixed(2);
-                if (valPerc > 0) document.getElementById('inpMedido').value = valPerc.toFixed(2);
-                document.getElementById('inpAditivo').value = valAditivo.toFixed(2);
-                document.getElementById('inpSupressao').value = valSupressao.toFixed(2);
-
-                macrosList = macrosDetectadas.filter(m => m.executado > 0.01);
-                
-                if (macrosList.length > 0) {
-                    radarChart.data.labels = macrosList.map(m => m.id);
-                    radarChart.data.datasets[0].data = macrosList.map(m => m.executado);
-                } else {
-                    radarChart.data.labels = ['Sem Medição'];
-                    radarChart.data.datasets[0].data = [0];
-                }
-                radarChart.update();
-                renderMacroTable();
-
-                atualizarInterface();
-                document.getElementById('fileNameDisplay').innerHTML = `✅ Filtro rígido ativado! <strong>${macrosList.length}</strong> serviços lidos.`;
-
-            } catch(e) {
-                document.getElementById('fileNameDisplay').innerHTML = `⚠️ Erro de leitura.`;
-            }
-        };
-        reader.readAsArrayBuffer(file);
+    inputs.forEach(input => {
+        input.addEventListener('input', calculateTotal);
     });
 
-    // ==========================================
-    // EMISSÃO DE WORD
-    // ==========================================
-    function gerarWordAtraso() {
-        let mesAtual = document.getElementById('selMes').value;
-        let vPrevisto = cronogramaAcumulado[mesAtual - 1].toFixed(2);
-        let vMedido = document.getElementById('inpMedido').value;
-        let atraso = (vPrevisto - vMedido).toFixed(2);
-        let valMetaProxima = document.getElementById('valMetaProxima').innerText;
-        let dataAtual = new Date().toLocaleDateString('pt-BR');
-        
-        let conteudoWord = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'><title>Notificação</title></head>
-        <body style="font-family: Arial, sans-serif;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2>TRIBUNAL DE JUSTIÇA DO ESTADO DE MATO GROSSO DO SUL</h2>
-                <h3>Coordenadoria de Fiscalização de Obras</h3>
-            </div>
-            <p style="text-align: right;">Campo Grande/MS, ${dataAtual}</p><br>
-            <p><strong>À EMPRESA POLIGONAL ENGENHARIA E CONSTRUÇÕES LTDA.</strong></p>
-            <p><strong>Assunto: NOTIFICAÇÃO DE ATRASO NO CRONOGRAMA FÍSICO (Mês ${mesAtual})</strong></p>
-            <br>
-            <p style="text-align: justify; line-height: 1.5;">Prezados Senhores,</p>
-            <p style="text-align: justify; line-height: 1.5;">Na qualidade de Fiscalização da obra, servimo-nos do presente para <strong>NOTIFICAR</strong> os apontamentos de atraso gerencial:</p>
-            <ul>
-                <li><strong>Avanço Físico Acumulado Previsto:</strong> ${vPrevisto}%</li>
-                <li><strong>Avanço Físico Acumulado Executado:</strong> ${vMedido}%</li>
-                <li><strong>Desvio Constatado:</strong> <span style="color: red; font-weight: bold;">${atraso}%</span></li>
-            </ul>
-            <p style="text-align: justify; line-height: 1.5;">
-                Ressaltamos que, para equalizar a curva da obra e não comprometer a entrega final, a contratada deverá apresentar faturamento físico na ordem de <strong>${valMetaProxima}</strong> na próxima medição.
-            </p>
-            <p style="text-align: justify; line-height: 1.5;">Exige-se a apresentação de um <strong>Plano de Recuperação de Cronograma</strong> no prazo máximo de 48 horas.</p>
-            <br><br><br>
-            <div style="text-align: center;">
-                _________________________________________________<br>
-                <strong>Eng. Fernando Vale da Silva</strong><br>Fiscal de Obras - TJMS
-            </div>
-        </body>
-        </html>
-        `;
+    // FOTOS COM BOTÃO DE REMOVER
+    function previewImages() {
+        var preview = document.getElementById('photo-container');
+        var files = document.getElementById('image-upload').files;
 
-        let blob = new Blob(['\ufeff', conteudoWord], { type: 'application/msword' });
-        let link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Notificacao_Medicao_${mesAtual}_${dataAtual.replace(/\//g, '-')}.doc`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        if (files) {
+            [].forEach.call(files, function(file) {
+                var reader = new FileReader();
+                reader.addEventListener("load", function() {
+                    var div = document.createElement('div');
+                    div.className = 'photo-preview';
+                    
+                    var img = document.createElement('img');
+                    img.src = this.result;
+                    
+                    var btnRemove = document.createElement('button');
+                    btnRemove.innerHTML = 'X';
+                    btnRemove.className = 'btn-remove-photo';
+                    btnRemove.onclick = function() { div.remove(); };
+
+                    var input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'photo-caption';
+                    input.placeholder = 'Digite a legenda da foto...';
+
+                    div.appendChild(img);
+                    div.appendChild(btnRemove);
+                    div.appendChild(input);
+                    preview.appendChild(div);
+                });
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    // SISTEMA DE AUTO-SALVAR (LocalStorage)
+    const allInputs = document.querySelectorAll('input:not([type="file"]), textarea');
+
+    // Carregar dados salvos ao abrir a página
+    window.onload = function() {
+        allInputs.forEach(input => {
+            if (input.type === 'radio') {
+                let saved = localStorage.getItem('rdo_' + input.name);
+                if (saved === input.value) input.checked = true;
+            } else {
+                let saved = localStorage.getItem('rdo_' + input.id);
+                if (saved !== null) input.value = saved;
+            }
+        });
+        calculateTotal();
+    };
+
+    // Salvar dados a cada digitação/alteração
+    allInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.type === 'radio') {
+                localStorage.setItem('rdo_' + this.name, this.value);
+            } else {
+                localStorage.setItem('rdo_' + this.id, this.value);
+            }
+        });
+    });
+
+    // Limpar formulário para iniciar um novo dia
+    function limparDados() {
+        if(confirm("Tem certeza que deseja apagar todos os dados para iniciar um novo diário?")) {
+            localStorage.clear();
+            allInputs.forEach(input => {
+                if (input.type === 'radio') input.checked = false;
+                else if (input.id !== 'obra-nome' && input.id !== 'empresa-nome' && input.id !== 'contrato-num' && input.id !== 'local-obra') {
+                    input.value = ''; // Mantém os dados fixos
+                }
+            });
+            document.getElementById('photo-container').innerHTML = '';
+            calculateTotal();
+        }
     }
 </script>
+
 </body>
 </html>
