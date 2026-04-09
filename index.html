@@ -96,7 +96,7 @@
             box-sizing: border-box;
         }
         
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus {
             background-color: #e8f0fe;
         }
 
@@ -138,6 +138,7 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+            flex-wrap: wrap; /* Permite que os botões desçam de linha se não couberem */
         }
 
         .btn {
@@ -207,6 +208,9 @@
             height: 25px;
             cursor: pointer;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* ASSINATURAS */
@@ -223,17 +227,96 @@
             padding-top: 5px;
         }
 
-        /* IMPRESSÃO */
+        /* =========================================
+           RESPONSIVIDADE (CELULARES E TABLETS)
+           ========================================= */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            /* Cabeçalho empilhado no celular */
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .header-rdo-info {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            /* Transforma Tabelas em Blocos empilhados */
+            table, tbody, tr, td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            table tr {
+                margin-bottom: 10px;
+                border: 1px solid var(--border-color);
+            }
+            table td {
+                border: none;
+                border-bottom: 1px dotted #ccc;
+                padding: 10px;
+            }
+            table td:last-child {
+                border-bottom: none;
+            }
+            /* Facilita o toque nos inputs no celular */
+            input[type="text"], input[type="date"], input[type="time"] {
+                background-color: #f9f9f9;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-top: 5px;
+            }
+            .input-number-small {
+                width: 60px !important;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            /* Grade de equipe passa para 2 colunas */
+            .equipe-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .equipe-item[style*="grid-column: span 2;"] {
+                grid-column: span 2 !important; /* Mantém ocupando as 2 colunas */
+            }
+            /* Botões e fotos */
+            .controls {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+            #photo-container {
+                grid-template-columns: 1fr; /* 1 foto por linha no celular */
+            }
+            /* Assinaturas empilhadas */
+            .assinaturas {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+            }
+            .assinatura-box {
+                width: 80%;
+            }
+        }
+
+        /* =========================================
+           IMPRESSÃO (PDF)
+           ========================================= */
         @media print {
             body {
                 background: white;
                 padding: 0;
-                -webkit-print-color-adjust: exact; /* Força o Chrome/Edge a imprimir o fundo */
-                print-color-adjust: exact; /* Regra padrão para forçar as cores */
-            }
-            .section-title {
-                background-color: #1a4066 !important; /* Garante o azul escuro na impressão */
-                color: white !important; /* Garante a letra branca na impressão */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .container {
                 box-shadow: none;
@@ -249,6 +332,34 @@
                 resize: none;
                 overflow: hidden;
             }
+            .section-title {
+                background-color: #1a4066 !important;
+                color: white !important;
+            }
+            /* No papel, a equipe SEMPRE tem 4 colunas e as tabelas voltam ao normal, mesmo se for impresso via celular */
+            .equipe-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+            table, tbody, tr, td {
+                display: table !important;
+            }
+            tr { display: table-row !important; }
+            td { display: table-cell !important; }
+            input[type="text"], input[type="date"], input[type="time"], input[type="number"] {
+                background-color: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .assinaturas {
+                flex-direction: row !important;
+                gap: 0 !important;
+            }
+            .assinatura-box {
+                width: 40% !important;
+            }
+            #photo-container {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
             @page {
                 size: A4;
                 margin: 15mm;
@@ -262,7 +373,7 @@
     
     <div class="header">
         <div class="logo-placeholder">
-            <img src="imagem1.jpg" style="width: 80px; height: auto;">
+            <img src="Imagem1.jpg" style="width: 80px; height: auto;">
         </div>
         <div class="header-text">
             <p>ESTADO DE MATO GROSSO DO SUL</p>
@@ -273,7 +384,7 @@
         <div class="header-rdo-info">
             <p>FOLHA Nº: <input type="text" id="folha-num" style="width: 50px; text-align: center; border-bottom: 1px solid #000;"></p>
             <div class="logo-placeholder" style="margin-top:10px;">
-                <img src="imagem2.jpg" style="width: 80px; height: auto;">
+                <img src="Imagem2.jpg" style="width: 80px; height: auto;">
             </div>
         </div>
     </div>
@@ -305,8 +416,8 @@
         <tr>
             <td colspan="2"><b>DIA DA SEMANA:</b> <input type="text" id="dia-semana" style="width: 60%"></td>
             <td colspan="2">
-                <b>PERÍODO DE CHUVA:</b> <input type="time" id="chuva-inicio" style="width:60px"> às <input type="time" id="chuva-fim" style="width:60px"><br>
-                <b>PARALISAÇÃO:</b> <input type="time" id="para-inicio" style="width:60px"> às <input type="time" id="para-fim" style="width:60px">
+                <b>PERÍODO DE CHUVA:</b> <input type="time" id="chuva-inicio" style="width:70px"> às <input type="time" id="chuva-fim" style="width:70px"><br>
+                <b>PARALISAÇÃO:</b> <input type="time" id="para-inicio" style="width:70px"> às <input type="time" id="para-fim" style="width:70px">
             </td>
         </tr>
     </table>
@@ -325,14 +436,14 @@
         <div class="equipe-item"><label>Engenheiro:</label> <input type="number" id="eq-engenheiro" class="input-number-small sum-calc" min="0"></div>
         <div class="equipe-item"><label>Administrativo:</label> <input type="number" id="eq-adm" class="input-number-small sum-calc" min="0"></div>
         <div class="equipe-item"><label>Empreiteiros:</label> <input type="number" id="eq-empreiteiros" class="input-number-small sum-calc" min="0"></div>
-        <div class="equipe-item" style="grid-column: span 2;"><label>Outros/Equipamentos:</label> <input type="text" id="eq-outros" style="width: 70%;"></div>
-        <div class="equipe-item" style="background-color: #eef; font-weight: bold;"><label>TOTAL GERAL:</label> <input type="text" id="total-equipe" class="input-number-small" readonly style="font-weight: bold; background: transparent;"></div>
+        <div class="equipe-item" style="grid-column: span 2;"><label>Outros/Equip.:</label> <input type="text" id="eq-outros" style="width: 60%;"></div>
+        <div class="equipe-item" style="background-color: #eef; font-weight: bold;"><label>TOTAL:</label> <input type="text" id="total-equipe" class="input-number-small" readonly style="font-weight: bold; background: transparent; border: none;"></div>
     </div>
 
     <div class="section-title">DESCRIÇÃO DOS SERVIÇOS EXECUTADOS</div>
     <textarea id="desc-servicos" placeholder="Detalhe as atividades realizadas no dia..."></textarea>
 
-    <div class="section-title">COMENTÁRIOS / OCORRÊNCIAS DA FISCALIZAÇÃO / OCORRÊNCIAS EMPRESA</div>
+    <div class="section-title">COMENTÁRIOS / OCORRÊNCIAS DA FISCALIZAÇÃO</div>
     <textarea id="desc-ocorrencias" placeholder="Apontamentos da fiscalização, interferências, aprovações, etc..."></textarea>
 
     <div class="section-title">RELATÓRIO FOTOGRÁFICO</div>
@@ -414,7 +525,6 @@
     // SISTEMA DE AUTO-SALVAR (LocalStorage)
     const allInputs = document.querySelectorAll('input:not([type="file"]), textarea');
 
-    // Carregar dados salvos ao abrir a página
     window.onload = function() {
         allInputs.forEach(input => {
             if (input.type === 'radio') {
@@ -428,7 +538,6 @@
         calculateTotal();
     };
 
-    // Salvar dados a cada digitação/alteração
     allInputs.forEach(input => {
         input.addEventListener('input', function() {
             if (this.type === 'radio') {
@@ -439,14 +548,13 @@
         });
     });
 
-    // Limpar formulário para iniciar um novo dia
     function limparDados() {
         if(confirm("Tem certeza que deseja apagar todos os dados para iniciar um novo diário?")) {
             localStorage.clear();
             allInputs.forEach(input => {
                 if (input.type === 'radio') input.checked = false;
                 else if (input.id !== 'obra-nome' && input.id !== 'empresa-nome' && input.id !== 'contrato-num' && input.id !== 'local-obra') {
-                    input.value = ''; // Mantém os dados fixos
+                    input.value = ''; 
                 }
             });
             document.getElementById('photo-container').innerHTML = '';
