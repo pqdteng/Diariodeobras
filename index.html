@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sala de Comando: PQDT Engenheiro</title>
+    <title>Sala de Comando: Auditor TCE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -27,14 +27,20 @@
         
         select.btn { background-color: #2A2A2A; color: #E0E0E0; outline: none; }
 
-        /* GAMIFICAÇÃO */
+        /* GAMIFICAÇÃO - TRIBUNAL DE CONTAS */
         .rank-container { background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 2px solid var(--accent-gold); border-radius: 15px; padding: 15px 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.15); flex-wrap: wrap; gap: 20px;}
         .rank-info { display: flex; align-items: center; gap: 20px; }
         .rank-icon { font-size: 3.5em; color: var(--accent-gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
         .rank-details h2 { margin: 0; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5em; }
+        .rank-details p { margin: 5px 0 0 0; color: #aaa; font-size: 0.9em; }
         .xp-bar-container { flex-grow: 1; max-width: 500px; display: flex; flex-direction: column; gap: 8px; }
         .xp-bar-bg { width: 100%; height: 16px; background-color: #333; border-radius: 10px; overflow: hidden; border: 1px solid #555; }
         .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #FFBE0B, #FFD700); width: 0%; transition: 1.5s ease-out; }
+        
+        .bonus-badges { display: flex; gap: 15px; margin-top: 5px; font-size: 0.85em; }
+        .badge { background: #333; padding: 5px 12px; border-radius: 6px; color: #888; display: flex; align-items: center; gap: 6px; transition: 0.5s; }
+        .badge.active-q { background: rgba(255, 190, 11, 0.2); color: var(--accent-orange); border: 1px solid var(--accent-orange); box-shadow: 0 0 10px rgba(255, 190, 11, 0.3); }
+        .badge.active-h { background: rgba(56, 176, 0, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); box-shadow: 0 0 10px rgba(56, 176, 0, 0.3); }
 
         /* FOCO E CRONÔMETRO */
         .focus-section { display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 30px; flex-wrap: wrap; }
@@ -78,14 +84,14 @@
         .card-hrs { border-color: var(--accent-purple); } .card-hrs .card-icon { color: var(--accent-purple); }
         .card-vel { border-color: var(--accent-orange); } .card-vel .card-icon { color: var(--accent-orange); }
 
-        /* GRÁFICOS (Padrão Original Restaurado) */
+        /* GRÁFICOS */
         .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .chart-box { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); min-height: 400px; }
         .full-width { grid-column: 1 / -1; }
         canvas { width: 100% !important; height: 100% !important; }
         #dynamic-title { color: var(--accent-orange); margin-top: -10px; margin-bottom: 20px; font-size: 1.2em; display: none;}
 
-        /* RELATÓRIOS (Restaurado) */
+        /* RELATÓRIOS */
         .report-section { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top: 30px; display: none; }
         .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .report-header h2 { margin: 0; font-size: 1.5em; color: var(--accent-blue); }
@@ -100,13 +106,13 @@
         .bad-acc { color: var(--accent-red); font-weight: bold; }
         .details-link { color: var(--accent-blue); text-decoration: none; cursor: pointer; font-weight: bold; }
 
-        /* MODAIS (Lançamento e Raio-X) */
+        /* MODAIS */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); overflow-y: auto;}
         .modal-content { background-color: var(--card-bg); margin: 5% auto; padding: 25px; border: 1px solid #444; width: 90%; max-width: 750px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.9); }
         .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
         .close-btn:hover { color: white; }
 
-        /* Específico Modal Raio-X */
+        /* Modal Raio-X */
         .modal-header-social { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;}
         .modal-header-social h3 { margin: 0; color: var(--accent-orange); font-size: 1.5em; display: flex; align-items: center; gap: 10px;}
         .modal-kpi-container { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;}
@@ -116,7 +122,7 @@
         .modal-chart-area { display: flex; justify-content: center; align-items: center; background: #252525; border-radius: 12px; padding: 20px; margin-bottom: 25px; height: 280px;}
         .modal-table-area { overflow-x: auto; }
 
-        /* Específico Modal Lançamento */
+        /* Modal Lançamento */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; color: var(--accent-orange); font-size: 0.85em; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; }
         .form-group input, .form-group select { width: 100%; padding: 12px; background: #121212; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; font-size: 1em; outline: none;}
@@ -128,7 +134,7 @@
 <body>
 
     <div class="header">
-        <h1><i class="fas fa-parachute-box"></i> Sala de Comando: PQDT Engenheiro</h1>
+        <h1><i class="fas fa-landmark"></i> Sala de Comando: Auditor TCE</h1>
         <div class="controls">
             <select id="subjectFilter" class="btn" onchange="updateDashboard(this.value)">
                 <option value="all">Visão Geral (Todas as Disciplinas)</option>
@@ -140,18 +146,27 @@
 
     <div class="rank-container" id="rank-panel" style="display: none;">
         <div class="rank-info">
-            <i class="fas fa-medal rank-icon" id="rank-icon"></i>
+            <i class="fas fa-user-graduate rank-icon" id="rank-icon"></i>
             <div class="rank-details">
-                <h2 id="rank-title">Recruta</h2>
-                <p id="rank-subtitle">Iniciando Operação Mão Divina</p>
+                <h2 id="rank-title">Estagiário de Controle</h2>
+                <p id="rank-subtitle">Iniciando nas normas de auditoria</p>
             </div>
         </div>
         <div class="xp-bar-container">
             <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #aaa; font-weight: bold;">
-                <span>Progresso para Promoção</span>
-                <span id="rank-progress-text">0 / 500 Q</span>
+                <span>Evolução na Carreira (XP Questões)</span>
+                <span id="rank-progress-text">0 / 1000 Q</span>
             </div>
             <div class="xp-bar-bg"><div class="xp-bar-fill" id="rank-bar"></div></div>
+            
+            <div class="bonus-badges">
+                <div class="badge" id="badge-q">
+                    <i class="fas fa-fire"></i> Questões Hoje: <span id="txt-daily-q">0</span> / 100
+                </div>
+                <div class="badge" id="badge-h">
+                    <i class="fas fa-clock"></i> Horas Hoje: <span id="txt-daily-h">0.0</span> / 2h
+                </div>
+            </div>
         </div>
     </div>
 
@@ -297,7 +312,15 @@
                     <div class="form-group"><label>Questões</label><input type="number" id="f-q" required min="0" value="0"></div>
                     <div class="form-group"><label>Acertos</label><input type="number" id="f-a" required min="0" value="0"></div>
                 </div>
-                <div class="form-group"><label>Fase</label><select id="f-fase" required><option value="Fase 1">Fase 1</option><option value="Fase 2">Fase 2</option><option value="Fase 3">Fase 3</option><option value="Fase 4">Fase 4</option></select></div>
+                <div class="form-group">
+                    <label>Fase</label>
+                    <select id="f-fase" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
                 <button type="submit" id="btn-submit-form" class="form-submit-btn">ENVIAR PARA BASE_DASHBOARD</button>
             </form>
         </div>
@@ -317,15 +340,21 @@
         let groupedDaily = {}, groupedWeekly = {}; 
         let chart1Obj, chart2Obj, chart3Obj, modalPieChartObj; 
         let currentReportMode = 'diario'; let currentWeekStr = "";
-        let totalQHistory = 0;
+        let totalQHistory = 0; let dailyQ = 0; let dailyMins = 0;
 
-        const MILITARY_RANKS = [
-            { threshold: 0, title: "Recruta", icon: "fa-seedling" }, { threshold: 1000, title: "Soldado", icon: "fa-shoe-prints" },
-            { threshold: 3000, title: "Cabo", icon: "fa-shield-alt" }, { threshold: 6000, title: "3º Sargento", icon: "fa-chevron-up" },
-            { threshold: 10000, title: "2º Sargento", icon: "fa-angle-double-up" }, { threshold: 15000, title: "1º Sargento", icon: "fa-star-half-alt" },
-            { threshold: 20000, title: "Tenente", icon: "fa-star" }, { threshold: 30000, title: "Capitão", icon: "fa-fighter-jet" },
-            { threshold: 50000, title: "Major", icon: "fa-bomb" }, { threshold: 75000, title: "Coronel", icon: "fa-eagle" },
-            { threshold: 100000, title: "Marechal PQDT", icon: "fa-parachute-box" }
+        // CARREIRA NO TRIBUNAL DE CONTAS
+        const AUDITOR_RANKS = [
+            { threshold: 0, title: "Estagiário de Controle", icon: "fa-user-graduate", desc: "Iniciando nas normas de auditoria" },
+            { threshold: 1000, title: "Trainee em Auditoria", icon: "fa-book-reader", desc: "Lendo a Lei de Licitações" },
+            { threshold: 3000, title: "Auditor Júnior", icon: "fa-search-dollar", desc: "Analisando os primeiros empenhos" },
+            { threshold: 6000, title: "Auditor Pleno", icon: "fa-file-invoice-dollar", desc: "Dominando o Controle Externo" },
+            { threshold: 10000, title: "Auditor Sênior", icon: "fa-balance-scale", desc: "Liderando inspeções" },
+            { threshold: 15000, title: "Inspetor de Controle", icon: "fa-clipboard-check", desc: "Chefiando a fiscalização" },
+            { threshold: 20000, title: "Assessor de Conselheiro", icon: "fa-user-tie", desc: "Minutando votos pesados" },
+            { threshold: 30000, title: "Procurador de Contas", icon: "fa-gavel", desc: "Fiscal da lei" },
+            { threshold: 50000, title: "Auditor-Substituto", icon: "fa-chair", desc: "Substituindo na Corte" },
+            { threshold: 75000, title: "Conselheiro do TCE", icon: "fa-landmark", desc: "Julgando contas do Governador" },
+            { threshold: 100000, title: "Presidente do TCE", icon: "fa-star", desc: "Referência Nacional em Controle!" }
         ];
 
         const cicloMaster = [
@@ -359,7 +388,12 @@
         window.onload = function() {
             updateTimerDisplay();
             let select = document.getElementById('f-materia');
-            cicloMaster.forEach(d => { let opt = document.createElement('option'); opt.value = d.nome; opt.innerText = d.nome; select.appendChild(opt); });
+            cicloMaster.forEach(d => { 
+                let opt = document.createElement('option'); 
+                opt.value = d.chaves[0]; // ENVIA A SIGLA PARA A PLANILHA
+                opt.innerText = d.nome;  // MOSTRA O NOME COMPLETO NA TELA
+                select.appendChild(opt); 
+            });
             document.getElementById('f-data').valueAsDate = new Date();
             if(localStorage.getItem('metaHrs')) document.getElementById('meta-hrs').value = localStorage.getItem('metaHrs');
             if(localStorage.getItem('metaQ')) document.getElementById('meta-q').value = localStorage.getItem('metaQ');
@@ -398,10 +432,11 @@
         }
 
         function processData(data) {
-            globalData = []; groupedDaily = {}; groupedWeekly = {}; totalQHistory = 0;
+            globalData = []; groupedDaily = {}; groupedWeekly = {}; totalQHistory = 0; dailyQ = 0; dailyMins = 0;
             currentWeekStr = getWeekNumber(new Date());
             let uniqueSubjects = new Set();
             let startRow = (data[0] && String(data[0][2]).toLowerCase().includes('mat')) ? 1 : 0;
+            let todayStr = new Date().toLocaleDateString('pt-BR');
 
             for(let i = startRow; i < data.length; i++) {
                 let r = data[i]; if(!r || r.length < 8) continue;
@@ -420,6 +455,12 @@
                     let dateStr = r[1] ? String(r[1]).trim() : '';
                     let dParts = dateStr.split('/');
                     if(dParts.length === 3) dateObj = new Date(dParts[2], dParts[1] - 1, dParts[0]);
+
+                    // Extrai bônus diário
+                    if(dateObj.toLocaleDateString('pt-BR') === todayStr) {
+                        dailyQ += q;
+                        dailyMins += t;
+                    }
 
                     globalData.push({ rowData: r, dataReal: dateObj, mat: mat, topico: topico, link: link, q: q, a: a, t: t, originalIndex: i });
 
@@ -463,13 +504,22 @@
         // GAMIFICAÇÃO & GPS
         // ==============================================================================
         function updateRank() {
-            let rank = MILITARY_RANKS[0]; let next = MILITARY_RANKS[1];
-            for(let i = 0; i < MILITARY_RANKS.length; i++) { if(totalQHistory >= MILITARY_RANKS[i].threshold) { rank = MILITARY_RANKS[i]; next = MILITARY_RANKS[i+1] || rank; } }
+            let rank = AUDITOR_RANKS[0]; let next = AUDITOR_RANKS[1];
+            for(let i = 0; i < AUDITOR_RANKS.length; i++) { if(totalQHistory >= AUDITOR_RANKS[i].threshold) { rank = AUDITOR_RANKS[i]; next = AUDITOR_RANKS[i+1] || rank; } }
             document.getElementById('rank-title').innerText = rank.title;
+            document.getElementById('rank-subtitle').innerText = rank.desc;
             document.getElementById('rank-icon').className = `fas ${rank.icon} rank-icon`;
             let pct = rank === next ? 100 : ((totalQHistory - rank.threshold) / (next.threshold - rank.threshold)) * 100;
-            document.getElementById('rank-progress-text').innerText = `${totalQHistory.toLocaleString()} / ${next.threshold.toLocaleString()} Q para ${next.title}`;
+            document.getElementById('rank-progress-text').innerText = `${totalQHistory.toLocaleString()} / ${next.threshold.toLocaleString()} Q`;
             document.getElementById('rank-bar').style.width = Math.min(pct, 100) + '%';
+
+            // Atualiza Emblemas Diários
+            let dailyH = (dailyMins / 60).toFixed(1);
+            document.getElementById('txt-daily-q').innerText = dailyQ;
+            document.getElementById('txt-daily-h').innerText = dailyH;
+
+            if(dailyQ >= 100) { document.getElementById('badge-q').className = "badge active-q"; } else { document.getElementById('badge-q').className = "badge"; }
+            if(dailyH >= 2) { document.getElementById('badge-h').className = "badge active-h"; } else { document.getElementById('badge-h').className = "badge"; }
         }
 
         function saveGoals() { localStorage.setItem('metaHrs', document.getElementById('meta-hrs').value); localStorage.setItem('metaQ', document.getElementById('meta-q').value); updateGPS(); }
@@ -488,7 +538,10 @@
 
             if(globalData.length > 0) {
                 let last = globalData[0]; // Como já está ordenado, o índice 0 é o mais recente
-                let idx = cicloMaster.findIndex(d => last.mat && last.mat.includes(d.nome)); if(idx === -1) idx = 0;
+                
+                // Procura correspondência pela sigla ou nome (já que a planilha agora guarda siglas)
+                let idx = cicloMaster.findIndex(d => last.mat === d.chaves[0] || last.mat.includes(d.nome)); 
+                if(idx === -1) idx = 0;
                 
                 let p1 = cicloMaster[(idx + 1) % cicloMaster.length];
                 let p2 = cicloMaster[(idx + 2) % cicloMaster.length];
@@ -503,13 +556,13 @@
                 let container = document.getElementById('gps-ultimo-caderno');
                 if(last.link && (last.link.includes("http") || last.link.includes("www"))) {
                     let urlRegex = /(https?:\/\/[^\s]+)/g; let extractedLink = last.link.match(urlRegex); let finalUrl = extractedLink ? extractedLink[0] : last.link;
-                    container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px;"><i class="fas fa-external-link-alt"></i> Retomar: ${p1.nome.substring(0,12)}</a>`;
+                    container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px;"><i class="fas fa-external-link-alt"></i> Retomar: ${p1.chaves[0]}</a>`;
                 } else { container.innerHTML = `<span style="font-size:12px; color:#666;">Sem link salvo em ${last.mat}.</span>`; }
             }
         }
 
         // ==============================================================================
-        // GRÁFICOS RESTAURADOS E DASHBOARD
+        // GRÁFICOS E DASHBOARD
         // ==============================================================================
         function updateDashboard(subjectFilter) {
             let filteredData = subjectFilter !== 'all' ? globalData.filter(item => item.mat === subjectFilter) : globalData;
@@ -555,7 +608,7 @@
         }
 
         // ==============================================================================
-        // RELATÓRIOS E MODAL RAIO-X (RESTAURADOS)
+        // RELATÓRIOS E MODAL RAIO-X
         // ==============================================================================
         function switchReport(mode) { currentReportMode = mode; document.getElementById('btnDiario').classList.remove('active'); document.getElementById('btnSemanal').classList.remove('active'); if(mode === 'diario') document.getElementById('btnDiario').classList.add('active'); else document.getElementById('btnSemanal').classList.add('active'); renderReport(); }
         
@@ -623,8 +676,17 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...'; btn.disabled = true;
             
             let parts = document.getElementById('f-data').value.split('-');
+            
+            // O value do select agora envia a Sigla (Ex: PNFL) ao invés do nome longo
             let payload = { 
-                dataEstudo: `${parts[2]}/${parts[1]}/${parts[0]}`, materia: document.getElementById('f-materia').value, topico: document.getElementById('f-topico').value, tipoLink: document.getElementById('f-tipo-link').value, tempo: document.getElementById('f-tempo').value, questoes: document.getElementById('f-q').value, acertos: document.getElementById('f-a').value, fase: document.getElementById('f-fase').value 
+                dataEstudo: `${parts[2]}/${parts[1]}/${parts[0]}`, 
+                materia: document.getElementById('f-materia').value, 
+                topico: document.getElementById('f-topico').value, 
+                tipoLink: document.getElementById('f-tipo-link').value, 
+                tempo: document.getElementById('f-tempo').value, 
+                questoes: document.getElementById('f-q').value, 
+                acertos: document.getElementById('f-a').value, 
+                fase: document.getElementById('f-fase').value 
             };
             
             fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
