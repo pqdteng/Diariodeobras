@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sala de Comando: Auditor TCE</title>
+    <title>Sala de Comando: Dashboard Gamificado</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -27,7 +27,7 @@
         
         select.btn { background-color: #2A2A2A; color: #E0E0E0; outline: none; }
 
-        /* GAMIFICAÇÃO - TRIBUNAL DE CONTAS */
+        /* GAMIFICAÇÃO - RANKING ESPORTS */
         .rank-container { background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 2px solid var(--accent-gold); border-radius: 15px; padding: 15px 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.15); flex-wrap: wrap; gap: 20px;}
         .rank-info { display: flex; align-items: center; gap: 20px; }
         .rank-icon { font-size: 3.5em; color: var(--accent-gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
@@ -134,7 +134,7 @@
 <body>
 
     <div class="header">
-        <h1><i class="fas fa-landmark"></i> Sala de Comando: Auditor TCE</h1>
+        <h1><i class="fas fa-gamepad"></i> Sala de Comando: Estudos</h1>
         <div class="controls">
             <select id="subjectFilter" class="btn" onchange="updateDashboard(this.value)">
                 <option value="all">Visão Geral (Todas as Disciplinas)</option>
@@ -146,15 +146,15 @@
 
     <div class="rank-container" id="rank-panel" style="display: none;">
         <div class="rank-info">
-            <i class="fas fa-user-graduate rank-icon" id="rank-icon"></i>
+            <i class="fas fa-hammer rank-icon" id="rank-icon"></i>
             <div class="rank-details">
-                <h2 id="rank-title">Estagiário de Controle</h2>
-                <p id="rank-subtitle">Iniciando nas normas de auditoria</p>
+                <h2 id="rank-title">Ferro</h2>
+                <p id="rank-subtitle">Iniciando a jornada</p>
             </div>
         </div>
         <div class="xp-bar-container">
             <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #aaa; font-weight: bold;">
-                <span>Evolução na Carreira (XP Questões)</span>
+                <span>Nível de XP (Questões)</span>
                 <span id="rank-progress-text">0 / 1000 Q</span>
             </div>
             <div class="xp-bar-bg"><div class="xp-bar-fill" id="rank-bar"></div></div>
@@ -208,7 +208,7 @@
             <h3><i class="fas fa-map-marked-alt"></i> Missão Dinâmica & Revisão</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 100%;">
                 <div class="action-box">
-                    <h4><i class="fas fa-route"></i> Próximos Passos</h4>
+                    <h4><i class="fas fa-route"></i> Próximos Alvos</h4>
                     <div id="gps-missao-hoje">
                         <p class="mission-day" id="mission-title">Sequência Atual</p>
                         <ul class="mission-list">
@@ -221,7 +221,7 @@
                 </div>
                 <div class="action-box">
                     <h4><i class="fas fa-external-link-alt"></i> Último Caderno</h4>
-                    <div id="gps-ultimo-caderno" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                    <div id="gps-ultimo-caderno" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%;">
                         <p>Aguardando Sincronização...</p>
                     </div>
                 </div>
@@ -333,7 +333,7 @@
         const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz1vLMkc_dklbl7AxBHKBF8j1amLTAHwrUwknmLAZJxuXXaL1ra-LBjqCihay9RbX4_Qw/exec";
 
         // ==============================================================================
-        // CONFIGURAÇÕES BASE
+        // CONFIGURAÇÕES BASE E GAMIFICAÇÃO
         // ==============================================================================
         Chart.defaults.color = '#E0E0E0'; Chart.defaults.borderColor = '#333';
         let globalData = []; 
@@ -342,23 +342,40 @@
         let currentReportMode = 'diario'; let currentWeekStr = "";
         let totalQHistory = 0; let dailyQ = 0; let dailyMins = 0;
 
-        // CARREIRA NO TRIBUNAL DE CONTAS
-        const AUDITOR_RANKS = [
-            { threshold: 0, title: "Estagiário de Controle", icon: "fa-user-graduate", desc: "Iniciando nas normas de auditoria" },
-            { threshold: 1000, title: "Trainee em Auditoria", icon: "fa-book-reader", desc: "Lendo a Lei de Licitações" },
-            { threshold: 3000, title: "Auditor Júnior", icon: "fa-search-dollar", desc: "Analisando os primeiros empenhos" },
-            { threshold: 6000, title: "Auditor Pleno", icon: "fa-file-invoice-dollar", desc: "Dominando o Controle Externo" },
-            { threshold: 10000, title: "Auditor Sênior", icon: "fa-balance-scale", desc: "Liderando inspeções" },
-            { threshold: 15000, title: "Inspetor de Controle", icon: "fa-clipboard-check", desc: "Chefiando a fiscalização" },
-            { threshold: 20000, title: "Assessor de Conselheiro", icon: "fa-user-tie", desc: "Minutando votos pesados" },
-            { threshold: 30000, title: "Procurador de Contas", icon: "fa-gavel", desc: "Fiscal da lei" },
-            { threshold: 50000, title: "Auditor-Substituto", icon: "fa-chair", desc: "Substituindo na Corte" },
-            { threshold: 75000, title: "Conselheiro do TCE", icon: "fa-landmark", desc: "Julgando contas do Governador" },
-            { threshold: 100000, title: "Presidente do TCE", icon: "fa-star", desc: "Referência Nacional em Controle!" }
+        // RANKS DE JOGOS CLÁSSICOS (GENÉRICOS E COMPETITIVOS)
+        const GAMER_RANKS = [
+            { threshold: 0, title: "Ferro", icon: "fa-hammer", desc: "Iniciando a jornada" },
+            { threshold: 1000, title: "Bronze", icon: "fa-medal", desc: "Ganhando consistência" },
+            { threshold: 3000, title: "Prata", icon: "fa-shield-alt", desc: "Concurseiro focado" },
+            { threshold: 6000, title: "Ouro", icon: "fa-trophy", desc: "Desempenho de elite" },
+            { threshold: 10000, title: "Platina", icon: "fa-star", desc: "Rumo à aprovação" },
+            { threshold: 15000, title: "Diamante", icon: "fa-gem", desc: "Mente brilhante" },
+            { threshold: 20000, title: "Mestre", icon: "fa-crown", desc: "Domínio absoluto" },
+            { threshold: 30000, title: "Grão-Mestre", icon: "fa-dragon", desc: "O terror das bancas" },
+            { threshold: 50000, title: "Desafiante", icon: "fa-fire", desc: "Disputando as cabeças" },
+            { threshold: 75000, title: "Lenda", icon: "fa-bolt", desc: "Nome no Diário Oficial" },
+            { threshold: 100000, title: "Mito", icon: "fa-meteor", desc: "Deus dos Concursos!" }
         ];
 
+        // INCLUÍDAS AS DISCIPLINAS PARECER E REDAÇÃO (NÃO PULARÁ MAIS O CICLO)
         const cicloMaster = [
-            { nome: "Eng: Planejamento de Obras", chaves: ["PNFL"] }, { nome: "AFO / Orçamento Público", chaves: ["AFO"] }, { nome: "Direito Constitucional", chaves: ["DCO"] }, { nome: "Controle Externo (TCE-SP)", chaves: ["CEX"] }, { nome: "Contabilidade Pública", chaves: ["CASP"] }, { nome: "Contabilidade Geral", chaves: ["CTG"] }, { nome: "Eng: Edificações/Estruturas", chaves: ["EDF"] }, { nome: "Eng: Ambiental", chaves: ["AMB"] }, { nome: "Direito Administrativo", chaves: ["DAD"] }, { nome: "Português", chaves: ["POR"] }, { nome: "Eng: Rodoviária", chaves: ["OR"] }, { nome: "Eng: Hídrica", chaves: ["OH"] }, { nome: "Raciocínio Lógico", chaves: ["RLM"] }, { nome: "Informática", chaves: ["INF"] }, { nome: "Auditoria Governamental", chaves: ["AUDG"] }
+            { nome: "Eng: Planejamento de Obras", chaves: ["PNFL"] }, 
+            { nome: "AFO / Orçamento Público", chaves: ["AFO"] }, 
+            { nome: "Direito Constitucional", chaves: ["DCO"] }, 
+            { nome: "Controle Externo (TCE-SP)", chaves: ["CEX"] }, 
+            { nome: "Contabilidade Pública", chaves: ["CASP"] }, 
+            { nome: "Contabilidade Geral", chaves: ["CTG"] }, 
+            { nome: "Eng: Edificações/Estruturas", chaves: ["EDF"] }, 
+            { nome: "Eng: Ambiental", chaves: ["AMB"] }, 
+            { nome: "Direito Administrativo", chaves: ["DAD"] }, 
+            { nome: "Português", chaves: ["POR"] }, 
+            { nome: "Eng: Rodoviária", chaves: ["OR"] }, 
+            { nome: "Eng: Hídrica", chaves: ["OH"] }, 
+            { nome: "Raciocínio Lógico", chaves: ["RLM"] }, 
+            { nome: "Informática", chaves: ["INF"] }, 
+            { nome: "Auditoria Governamental", chaves: ["AUDG"] },
+            { nome: "Peça Técnica / Parecer", chaves: ["PARECER", "PEÇA", "DISCURSIVA"] },
+            { nome: "Treino: Redação", chaves: ["RED", "REDAÇÃO"] }
         ];
 
         // ==============================================================================
@@ -390,7 +407,7 @@
             let select = document.getElementById('f-materia');
             cicloMaster.forEach(d => { 
                 let opt = document.createElement('option'); 
-                opt.value = d.chaves[0]; // ENVIA A SIGLA PARA A PLANILHA
+                opt.value = d.chaves[0]; // ENVIA A SIGLA PARA A PLANILHA (Ponto 1)
                 opt.innerText = d.nome;  // MOSTRA O NOME COMPLETO NA TELA
                 select.appendChild(opt); 
             });
@@ -467,13 +484,11 @@
                     let dayKey = dateObj.toLocaleDateString('pt-BR');
                     let weekKey = getWeekNumber(dateObj);
 
-                    // Agrupamento Diário
                     if(!groupedDaily[dayKey]) groupedDaily[dayKey] = { q:0, a:0, t:0, dateObj: dateObj, subjects: {} };
                     groupedDaily[dayKey].q += q; groupedDaily[dayKey].a += a; groupedDaily[dayKey].t += t;
                     if(!groupedDaily[dayKey].subjects[mat]) groupedDaily[dayKey].subjects[mat] = {q:0, a:0, t:0};
                     groupedDaily[dayKey].subjects[mat].q += q; groupedDaily[dayKey].subjects[mat].a += a; groupedDaily[dayKey].subjects[mat].t += t;
 
-                    // Agrupamento Semanal
                     if(!groupedWeekly[weekKey]) groupedWeekly[weekKey] = { q:0, a:0, t:0, weekStr: weekKey, subjects: {} };
                     groupedWeekly[weekKey].q += q; groupedWeekly[weekKey].a += a; groupedWeekly[weekKey].t += t;
                     if(!groupedWeekly[weekKey].subjects[mat]) groupedWeekly[weekKey].subjects[mat] = {q:0, a:0, t:0};
@@ -481,7 +496,6 @@
                 }
             }
 
-            // Ordena o Global Data pela data mais recente
             globalData.sort((A, B) => {
                 let diff = B.dataReal.getTime() - A.dataReal.getTime();
                 return diff !== 0 ? diff : B.originalIndex - A.originalIndex;
@@ -504,8 +518,8 @@
         // GAMIFICAÇÃO & GPS
         // ==============================================================================
         function updateRank() {
-            let rank = AUDITOR_RANKS[0]; let next = AUDITOR_RANKS[1];
-            for(let i = 0; i < AUDITOR_RANKS.length; i++) { if(totalQHistory >= AUDITOR_RANKS[i].threshold) { rank = AUDITOR_RANKS[i]; next = AUDITOR_RANKS[i+1] || rank; } }
+            let rank = GAMER_RANKS[0]; let next = GAMER_RANKS[1];
+            for(let i = 0; i < GAMER_RANKS.length; i++) { if(totalQHistory >= GAMER_RANKS[i].threshold) { rank = GAMER_RANKS[i]; next = GAMER_RANKS[i+1] || rank; } }
             document.getElementById('rank-title').innerText = rank.title;
             document.getElementById('rank-subtitle').innerText = rank.desc;
             document.getElementById('rank-icon').className = `fas ${rank.icon} rank-icon`;
@@ -513,7 +527,6 @@
             document.getElementById('rank-progress-text').innerText = `${totalQHistory.toLocaleString()} / ${next.threshold.toLocaleString()} Q`;
             document.getElementById('rank-bar').style.width = Math.min(pct, 100) + '%';
 
-            // Atualiza Emblemas Diários
             let dailyH = (dailyMins / 60).toFixed(1);
             document.getElementById('txt-daily-q').innerText = dailyQ;
             document.getElementById('txt-daily-h').innerText = dailyH;
@@ -537,13 +550,12 @@
             document.getElementById('lbl-q-feito').innerText = qFeitas; document.getElementById('lbl-q-pct').innerText = pctQ + '%'; document.getElementById('bar-q').style.width = pctQ + '%';
 
             if(globalData.length > 0) {
-                let last = globalData[0]; // Última matéria do histórico global
+                let last = globalData[0]; // Última matéria lançada
                 
-                // Encontra qual é a matéria "Agora" baseada no último estudo
                 let idx = cicloMaster.findIndex(d => last.mat === d.chaves[0] || last.mat.includes(d.nome)); 
                 if(idx === -1) idx = 0;
                 
-                let p1 = cicloMaster[(idx + 1) % cicloMaster.length]; // AGORA
+                let p1 = cicloMaster[(idx + 1) % cicloMaster.length]; // AGORA - A próxima no ciclo (mesmo que seja Redação ou Parecer)
                 let p2 = cicloMaster[(idx + 2) % cicloMaster.length];
                 let p3 = cicloMaster[(idx + 3) % cicloMaster.length];
                 let p4 = cicloMaster[(idx + 4) % cicloMaster.length];
@@ -553,12 +565,10 @@
                 document.getElementById('mission-t3').innerText = p3.nome;
                 document.getElementById('mission-t4').innerText = p4.nome;
 
-                // ==========================================
-                // BUSCA O CADERNO ESPECÍFICO DA MATÉRIA "AGORA" (p1)
-                // ==========================================
                 let linkCaderno = "";
                 let dataUltimaMissao = "--/--/----";
 
+                // Varredura para encontrar o último caderno de p1
                 for(let i = 0; i < globalData.length; i++) {
                     let item = globalData[i];
                     if(item.mat === p1.chaves[0] || item.mat.includes(p1.nome)) {
@@ -574,16 +584,15 @@
 
                 let container = document.getElementById('gps-ultimo-caderno');
 
+                // Lógica Inteligente para matérias com ou sem Link
                 if(linkCaderno !== "") {
-                    let urlRegex = /(https?:\/\/[^\s]+)/g; 
-                    let extractedLink = linkCaderno.match(urlRegex); 
-                    let finalUrl = extractedLink ? extractedLink[0] : linkCaderno;
-                    
+                    let urlRegex = /(https?:\/\/[^\s]+)/g; let extractedLink = linkCaderno.match(urlRegex); let finalUrl = extractedLink ? extractedLink[0] : linkCaderno;
                     container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px; margin-bottom: 8px;"><i class="fas fa-external-link-alt"></i> Retomar: ${p1.chaves[0]}</a>
                     <span style="font-size:12px; color:#888;">Último acesso: <strong>${dataUltimaMissao}</strong></span>`;
                 } else { 
-                    container.innerHTML = `<span style="font-size:12px; color:#666;">Sem link salvo para ${p1.chaves[0]}.</span>
-                    <span style="font-size:11px; color:#aaa; margin-top:5px; display:block;">Último acesso: <strong>${dataUltimaMissao !== "--/--/----" ? dataUltimaMissao : "Nunca"}</strong></span>`; 
+                    // Mostra normalmente na tela mesmo se a disciplina de AGORA não tiver um link web (ex: Parecer)
+                    container.innerHTML = `<span style="font-size:13px; color:#E0E0E0; background:#333; padding:10px; border-radius:8px; display:block; width:100%; box-sizing:border-box;">Alvo atual: <strong>${p1.chaves[0]}</strong><br><span style="color:#FFBE0B; font-size:11px;">Nenhum link web salvo anteriormente.</span></span>
+                    <span style="font-size:11px; color:#aaa; margin-top:8px; display:block;">Última vez estudada: <strong>${dataUltimaMissao !== "--/--/----" ? dataUltimaMissao : "Nunca"}</strong></span>`; 
                 }
             }
         }
@@ -689,7 +698,7 @@
         function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; } 
         
         // ==============================================================================
-        // MODAL DE LANÇAMENTO
+        // MODAL DE LANÇAMENTO (FORMULÁRIO INTERNO)
         // ==============================================================================
         function openEntryModal() { 
             if(timerSeconds > 0) document.getElementById('f-tempo').value = Math.floor(timerSeconds/60); 
@@ -706,7 +715,7 @@
             
             let payload = { 
                 dataEstudo: `${parts[2]}/${parts[1]}/${parts[0]}`, 
-                materia: document.getElementById('f-materia').value, 
+                materia: document.getElementById('f-materia').value, // Envia sigla Ponto 1
                 topico: document.getElementById('f-topico').value, 
                 tipoLink: document.getElementById('f-tipo-link').value, 
                 tempo: document.getElementById('f-tempo').value, 
@@ -718,11 +727,8 @@
             fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
             .then(() => { 
                 alert("🎯 Missão Registrada com Sucesso na Nuvem!"); 
-                
-                // O cronômetro NÃO é zerado. O timer continua rodando na memória.
                 document.getElementById('studyForm').reset(); 
                 document.getElementById('f-data').valueAsDate = new Date(); 
-                
                 closeEntryModal(); 
                 btn.innerHTML = 'ENVIAR PARA BASE_DASHBOARD'; btn.disabled = false; 
                 setTimeout(loadGoogleSheetsData, 1500); 
