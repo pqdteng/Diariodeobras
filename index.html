@@ -554,10 +554,16 @@
                 document.getElementById('mission-t4').innerText = p4.nome;
 
                 let container = document.getElementById('gps-ultimo-caderno');
+                let dataUltimaMissao = last.dataReal.toLocaleDateString('pt-BR'); // DATA ADICIONADA AQUI
+
                 if(last.link && (last.link.includes("http") || last.link.includes("www"))) {
                     let urlRegex = /(https?:\/\/[^\s]+)/g; let extractedLink = last.link.match(urlRegex); let finalUrl = extractedLink ? extractedLink[0] : last.link;
-                    container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px;"><i class="fas fa-external-link-alt"></i> Retomar: ${p1.chaves[0]}</a>`;
-                } else { container.innerHTML = `<span style="font-size:12px; color:#666;">Sem link salvo em ${last.mat}.</span>`; }
+                    container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px; margin-bottom: 8px;"><i class="fas fa-external-link-alt"></i> Retomar Caderno: ${last.mat.substring(0,15)}</a>
+                    <span style="font-size:12px; color:#888;">Último acesso: <strong>${dataUltimaMissao}</strong></span>`;
+                } else { 
+                    container.innerHTML = `<span style="font-size:12px; color:#666;">Sem link salvo em ${last.mat}.</span>
+                    <span style="font-size:11px; color:#aaa; margin-top:5px; display:block;">Último acesso: <strong>${dataUltimaMissao}</strong></span>`; 
+                }
             }
         }
 
@@ -665,6 +671,7 @@
         // MODAL DE LANÇAMENTO (FORMULÁRIO INTERNO)
         // ==============================================================================
         function openEntryModal() { 
+            // Puxa o tempo do cronômetro para o formulário, mas NÃO o zera
             if(timerSeconds > 0) document.getElementById('f-tempo').value = Math.floor(timerSeconds/60); 
             document.getElementById('entryModal').style.display = 'block'; 
         }
@@ -692,7 +699,13 @@
             fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
             .then(() => { 
                 alert("🎯 Missão Registrada com Sucesso na Nuvem!"); 
-                resetTimer(); document.getElementById('studyForm').reset(); closeEntryModal(); 
+                
+                // NOTA: O resetTimer() foi REMOVIDO daqui. O tempo continuará rodando.
+                // Resetamos apenas o formulário visual.
+                document.getElementById('studyForm').reset(); 
+                document.getElementById('f-data').valueAsDate = new Date(); // Mantém a data de hoje
+                
+                closeEntryModal(); 
                 btn.innerHTML = 'ENVIAR PARA BASE_DASHBOARD'; btn.disabled = false; 
                 setTimeout(loadGoogleSheetsData, 1500); 
             })
