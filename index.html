@@ -537,13 +537,13 @@
             document.getElementById('lbl-q-feito').innerText = qFeitas; document.getElementById('lbl-q-pct').innerText = pctQ + '%'; document.getElementById('bar-q').style.width = pctQ + '%';
 
             if(globalData.length > 0) {
-                let last = globalData[0]; // Como já está ordenado, o índice 0 é o mais recente
+                let last = globalData[0]; // Última matéria do histórico global
                 
-                // Procura correspondência pela sigla ou nome (já que a planilha agora guarda siglas)
+                // Encontra qual é a matéria "Agora" baseada no último estudo
                 let idx = cicloMaster.findIndex(d => last.mat === d.chaves[0] || last.mat.includes(d.nome)); 
                 if(idx === -1) idx = 0;
                 
-                let p1 = cicloMaster[(idx + 1) % cicloMaster.length];
+                let p1 = cicloMaster[(idx + 1) % cicloMaster.length]; // AGORA
                 let p2 = cicloMaster[(idx + 2) % cicloMaster.length];
                 let p3 = cicloMaster[(idx + 3) % cicloMaster.length];
                 let p4 = cicloMaster[(idx + 4) % cicloMaster.length];
@@ -553,16 +553,37 @@
                 document.getElementById('mission-t3').innerText = p3.nome;
                 document.getElementById('mission-t4').innerText = p4.nome;
 
-                let container = document.getElementById('gps-ultimo-caderno');
-                let dataUltimaMissao = last.dataReal.toLocaleDateString('pt-BR'); // DATA ADICIONADA AQUI
+                // ==========================================
+                // BUSCA O CADERNO ESPECÍFICO DA MATÉRIA "AGORA" (p1)
+                // ==========================================
+                let linkCaderno = "";
+                let dataUltimaMissao = "--/--/----";
 
-                if(last.link && (last.link.includes("http") || last.link.includes("www"))) {
-                    let urlRegex = /(https?:\/\/[^\s]+)/g; let extractedLink = last.link.match(urlRegex); let finalUrl = extractedLink ? extractedLink[0] : last.link;
-                    container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px; margin-bottom: 8px;"><i class="fas fa-external-link-alt"></i> Retomar Caderno: ${last.mat.substring(0,15)}</a>
+                for(let i = 0; i < globalData.length; i++) {
+                    let item = globalData[i];
+                    if(item.mat === p1.chaves[0] || item.mat.includes(p1.nome)) {
+                        if(dataUltimaMissao === "--/--/----") {
+                            dataUltimaMissao = item.dataReal.toLocaleDateString('pt-BR');
+                        }
+                        if(item.link && (item.link.includes("http") || item.link.includes("www"))) {
+                            linkCaderno = item.link;
+                            break; 
+                        }
+                    }
+                }
+
+                let container = document.getElementById('gps-ultimo-caderno');
+
+                if(linkCaderno !== "") {
+                    let urlRegex = /(https?:\/\/[^\s]+)/g; 
+                    let extractedLink = linkCaderno.match(urlRegex); 
+                    let finalUrl = extractedLink ? extractedLink[0] : linkCaderno;
+                    
+                    container.innerHTML = `<a href="${finalUrl}" target="_blank" class="btn" style="background:var(--accent-orange); color:black; font-size:13px; width:100%; justify-content:center; padding:12px; margin-bottom: 8px;"><i class="fas fa-external-link-alt"></i> Retomar: ${p1.chaves[0]}</a>
                     <span style="font-size:12px; color:#888;">Último acesso: <strong>${dataUltimaMissao}</strong></span>`;
                 } else { 
-                    container.innerHTML = `<span style="font-size:12px; color:#666;">Sem link salvo em ${last.mat}.</span>
-                    <span style="font-size:11px; color:#aaa; margin-top:5px; display:block;">Último acesso: <strong>${dataUltimaMissao}</strong></span>`; 
+                    container.innerHTML = `<span style="font-size:12px; color:#666;">Sem link salvo para ${p1.chaves[0]}.</span>
+                    <span style="font-size:11px; color:#aaa; margin-top:5px; display:block;">Último acesso: <strong>${dataUltimaMissao !== "--/--/----" ? dataUltimaMissao : "Nunca"}</strong></span>`; 
                 }
             }
         }
@@ -668,10 +689,9 @@
         function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; } 
         
         // ==============================================================================
-        // MODAL DE LANÇAMENTO (FORMULÁRIO INTERNO)
+        // MODAL DE LANÇAMENTO
         // ==============================================================================
         function openEntryModal() { 
-            // Puxa o tempo do cronômetro para o formulário, mas NÃO o zera
             if(timerSeconds > 0) document.getElementById('f-tempo').value = Math.floor(timerSeconds/60); 
             document.getElementById('entryModal').style.display = 'block'; 
         }
@@ -684,7 +704,6 @@
             
             let parts = document.getElementById('f-data').value.split('-');
             
-            // O value do select agora envia a Sigla (Ex: PNFL) ao invés do nome longo
             let payload = { 
                 dataEstudo: `${parts[2]}/${parts[1]}/${parts[0]}`, 
                 materia: document.getElementById('f-materia').value, 
@@ -700,10 +719,9 @@
             .then(() => { 
                 alert("🎯 Missão Registrada com Sucesso na Nuvem!"); 
                 
-                // NOTA: O resetTimer() foi REMOVIDO daqui. O tempo continuará rodando.
-                // Resetamos apenas o formulário visual.
+                // O cronômetro NÃO é zerado. O timer continua rodando na memória.
                 document.getElementById('studyForm').reset(); 
-                document.getElementById('f-data').valueAsDate = new Date(); // Mantém a data de hoje
+                document.getElementById('f-data').valueAsDate = new Date(); 
                 
                 closeEntryModal(); 
                 btn.innerHTML = 'ENVIAR PARA BASE_DASHBOARD'; btn.disabled = false; 
